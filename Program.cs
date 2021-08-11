@@ -1,55 +1,96 @@
 ﻿using System;
+using System.IO;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace homework4_Jakovlev
+namespace homework4._4
 {
-    class Program //Яковлев Сергей 
-    //Tusk 1
+    class Program
     {
-        /// <summary>Метод подсчёта количества пар элементов массива, в которых хотя бы одно число делится на 3</summary>
-        /// <param name="array">Массив элементов</param>
-        /// <param name="length">Длинна массива элементов</param>
-        /// <returns></returns>
-        static int GetNumberOfPairs(int[] array, int length)
+        /// <summary>Структура, содержащая Login и Password</summary>
+        struct Account
         {
-            int amountOfPairs = 0;
-            for (int i = 0; i < length - 1; i++)
+            public string Login;
+            public string Password;
+
+            /// <summary>Метод, считывающий логин и пароль из файла</summary>
+            /// <param name="filename">Название файла</param>
+            public void loadFromFile(string filename)
             {
-                if (array[i] % 3 == 0 || array[i + 1] % 3 == 0)
-                {
-                    amountOfPairs++;
-                }
+                filename = "..\\..\\" + filename;
+                StreamReader sr = new StreamReader(filename);
+                Login = sr.ReadLine();
+                Password = sr.ReadLine();
+                sr.Close();
             }
-            return amountOfPairs;
+
+        }
+
+        /// <summary>Метод поверяет корректность логина и пароля</summary>
+        /// <param name="toCheck">Стурктура для проверки</param>
+        /// <returns></returns>
+        static bool CheckLogAndPass(Account toCheck)
+        {
+            if (toCheck.Login == "root" && toCheck.Password == "GeekBrains")
+                return true;
+            else
+                return false;
+        }
+
+        /// <summary>Метод вывода слова "попыток" в правильном склонении</summary>
+        /// <param name="x">Количество "попыток"</param>
+        /// <returns></returns>
+        static string RightTryWord(int x)
+        {
+            string s = "";
+            // Попытка, когда заканчивается на один, кроме 11.
+            if (x % 10 == 1 && x != 11) s += " попытка";
+            else
+                // Попытки
+                if ((x >= 2 && x <= 4) || (x >= 22 && x <= 24) || (x >= 32 && x <= 34) || (x > 41 && x < 45)) s += " попытки";
+            else
+                    // Попыток
+                    if ((x == 11) || (x >= 5 && x <= 20) || (x >= 25 && x <= 30) || (x >= 35 && x < 41) || (x > 44 && x < 51)) s += " попыток";
+            return s;
         }
 
         static void Main(string[] args)
         {
-            const int arrayLength = 20;
-            int[] myArray = new int[arrayLength];
-            Random random = new Random();
-            int result;
+            Console.WriteLine("Вас приветствует программа проверки логина и пароля, считанных из файла.");
+            int AmountOfTries = 3;
 
-            Console.WriteLine("Вас приветствует программа подсчёта пар элементов, в которых хотя бы одно число делится на 3.");
-            Console.Write("\nВ следующем массиве [ ");
-            for (int i = 0; i < arrayLength; i++)
+            string[] fileName = { "data.txt", "tryData.txt", "reallyTryData.txt" };
+
+            Account account;
+            account.Login = "";
+            account.Password = "";
+
+            int i = 0;
+
+            do
             {
-                myArray[i] = random.Next(-10000, 10001);
-                Console.Write(myArray[i] + ", ");
-            }
-            Console.WriteLine("\b\b ]\n");
+                Console.WriteLine("\nЗагрузим файл: " + fileName[i]);
+                account.loadFromFile(fileName[i]);
 
-            result = GetNumberOfPairs(myArray, arrayLength);
+                Console.Write("Попытка авторизации: ");
 
-            Console.WriteLine($"Количество пар: {result}");
+                if (CheckLogAndPass(account))
+                {
+                    break;
+                }
+                else
+                {
+                    AmountOfTries--;
+                    Console.WriteLine("Неверный ввод логина или пароля." +
+                        Environment.NewLine + "У Вас осталось " + AmountOfTries + RightTryWord(AmountOfTries));
+                }
+                i++;
+            } while (AmountOfTries > 0);
 
+            Console.Write("Авторизация успешна!");
             Console.ReadKey();
         }
     }
-
-
-
-
-
-
 }
-
